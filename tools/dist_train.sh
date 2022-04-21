@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-CONFIG=$1
-GPUS=$2
+$WOKDIR=$1
+
 NNODES=${NNODES:-1}
 NODE_RANK=${NODE_RANK:-0}
 PORT=${PORT:-29500}
@@ -12,9 +12,9 @@ python -m torch.distributed.launch \
     --nnodes=$NNODES \
     --node_rank=$NODE_RANK \
     --master_addr=$MASTER_ADDR \
-    --nproc_per_node=$GPUS \
+    --nproc_per_node=1 \
     --master_port=$PORT \
     $(dirname "$0")/train.py \
-    $CONFIG \
+    --work-dir=$WOKDIR \
     --seed 0 \
     --launcher pytorch ${@:3}

@@ -158,3 +158,4 @@ evaluation = dict(
     dynamic_intervals=[(max_epochs - num_last_epochs, 1)],
     metric='bbox')
 log_config = dict(interval=50)
+loadfrom = "mmdetection/ckpt/yolox_s.ckpt"
