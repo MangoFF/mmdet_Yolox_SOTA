@@ -5,13 +5,6 @@ import os
 import os.path as osp
 import time
 import warnings
-import moxing as mox
-os.system("pip uninstall mmcv -y")
-os.system("pip uninstall mmcv-full -y")
-mox.file.copy('obs://chuanhaimangoking939/mmdetection/mmcv_full-1.4.8-cp37-cp37m-manylinux1_x86_64 .whl','/cache/mmcv_full-1.4.8-cp37-cp37m-manylinux1_x86_64.whl')
-os.system('pip install /cache/mmcv_full-1.4.8-cp37-cp37m-manylinux1_x86_64.whl')
-os.system("pip install openmim")
-os.system("pip install mmdet")
 import mmcv
 import torch
 import torch.distributed as dist
@@ -29,8 +22,8 @@ from mmdet.utils import (collect_env, get_root_logger, setup_multi_processes,
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('--config',default= "/home/ma-user/modelarts/user-job-dir/mmdetection/configs/yolox/yolox_l_baseline.py", help='train config file path')
-    parser.add_argument('--work-dir', default="/home/ma-user/modelarts/outputs/work-dir_0/" ,help='the dir to save logs and models')
+    parser.add_argument('--config',default= "mmdetection/configs/yolox/yolox_l_baseline.py", help='train config file path')
+    parser.add_argument('--work-dir',help='the dir to save logs and models')
     parser.add_argument(
         '--resume-from', help='the checkpoint file to resume from')
     parser.add_argument(

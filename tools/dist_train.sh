@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-$WOKDIR=$1
-
 NNODES=${NNODES:-1}
 NODE_RANK=${NODE_RANK:-0}
 PORT=${PORT:-29500}
@@ -15,6 +13,5 @@ python -m torch.distributed.launch \
     --nproc_per_node=1 \
     --master_port=$PORT \
     $(dirname "$0")/train.py \
-    --work-dir=$WOKDIR \
     --seed 0 \
     --launcher pytorch ${@:3}
