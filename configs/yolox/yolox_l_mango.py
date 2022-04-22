@@ -2,7 +2,7 @@ _base_ = ['../_base_/schedules/schedule_1x.py', '../_base_/default_runtime.py']
 
 img_scale = (480, 480)  # height, width
 # lr 默认是0.01
-exp_name = "Yolox_l_lrd35_s480_ldckpt"
+exp_name = "Yolox_l_lrd50_s480_ldckpt"
 # model settings
 model = dict(
     type='YOLOX',
@@ -10,10 +10,24 @@ model = dict(
     #这里改一点点
     random_size_range=(img_scale[0]/32-5,img_scale[0]/32+5),
     random_size_interval=20,
-    backbone=dict(type='CSPDarknet', deepen_factor=1, widen_factor=1),
+    backbone=dict(
+        type='ConvNeXt',
+        arch='tiny',
+        out_indices=(1,2,3,),
+        drop_path_rate=0.1,
+        gap_before_final_norm=True,
+        init_cfg=[
+            dict(
+                type='TruncNormal',
+                layer=['Conv2d', 'Linear'],
+                std=.02,
+                bias=0.),
+            dict(type='Constant', layer=['LayerNorm'], val=1., bias=0.),
+        ]),
+    #backbone=dict(type='CSPDarknet', deepen_factor=1, widen_factor=1),
     neck=dict(
         type='YOLOXPAFPN',
-        in_channels=[256, 512, 1024],
+        in_channels=[192, 384, 768],
         out_channels=256, num_csp_blocks=3),
     bbox_head=dict(
         type='YOLOXHead', num_classes=10, in_channels=256, feat_channels=256),
@@ -89,10 +103,8 @@ test_pipeline = [
 ]
 
 data = dict(
-    samples_per_gpu=36,
-    workers_per_gpu=4,
-    # samples_per_gpu=2,
-    # workers_per_gpu=2,
+    samples_per_gpu=2,
+    workers_per_gpu=2,
     persistent_workers=True,
     train=train_dataset,
     val=dict(
@@ -110,7 +122,7 @@ data = dict(
 # default 8 gpu
 optimizer = dict(
     type='SGD',
-    lr=0.01/35.0,
+    lr=0.01/50.0,
     momentum=0.9,
     weight_decay=5e-4,
     nesterov=True,

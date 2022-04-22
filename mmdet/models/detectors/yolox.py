@@ -123,6 +123,7 @@ class YOLOX(SingleStageDetector):
             size = random.randint(*self._random_size_range)
             aspect_ratio = float(
                 self._default_input_size[1]) / self._default_input_size[0]
+            #这里应该是为了保证还是原来的横纵比例
             size = (self._size_multiplier * size,
                     self._size_multiplier * int(aspect_ratio * size))
             tensor[0] = size[0]

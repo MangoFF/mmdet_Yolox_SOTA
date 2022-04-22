@@ -2,8 +2,10 @@
 from .builder import DATASETS, PIPELINES, build_dataloader, build_dataset
 from .cityscapes import CityscapesDataset
 from .coco import CocoDataset
+from .coco_cache import CocoDataset_cache
 from .coco_panoptic import CocoPanopticDataset
 from .custom import CustomDataset
+from .custom_cache import CustomDataset_cache
 from .dataset_wrappers import (ClassBalancedDataset, ConcatDataset,
                                MultiImageMixDataset, RepeatDataset)
 from .deepfashion import DeepFashionDataset
@@ -17,7 +19,7 @@ from .wider_face import WIDERFaceDataset
 from .xml_style import XMLDataset
 
 __all__ = [
-    'CustomDataset', 'XMLDataset', 'CocoDataset', 'DeepFashionDataset',
+    'CustomDataset','CustomDataset_cache', 'XMLDataset', 'CocoDataset','CocoDataset_cache', 'DeepFashionDataset',
     'VOCDataset', 'CityscapesDataset', 'LVISDataset', 'LVISV05Dataset',
     'LVISV1Dataset', 'GroupSampler', 'DistributedGroupSampler',
     'DistributedSampler', 'build_dataloader', 'ConcatDataset', 'RepeatDataset',

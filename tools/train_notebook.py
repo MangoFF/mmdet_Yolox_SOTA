@@ -22,8 +22,8 @@ from mmdet.utils import (collect_env, get_root_logger, setup_multi_processes,
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('--config',default= "mmdetection/configs/yolox/yolox_l_baseline.py", help='train config file path')
-    parser.add_argument('--work-dir',help='the dir to save logs and models')
+    parser.add_argument('--config',default= "mmdetection/configs/yolox/yolox_l_mango.py", help='train config file path')
+    parser.add_argument('--work-dir',default="ckpt",help='the dir to save logs and models')
     parser.add_argument(
         '--resume-from', help='the checkpoint file to resume from')
     parser.add_argument(
@@ -121,6 +121,8 @@ def main():
     if args.work_dir is not None:
         # update configs according to CLI args if args.work_dir is not None
         cfg.work_dir = args.work_dir
+        cfg.work_dir = osp.join(cfg.work_dir,
+                                cfg.exp_name)
     elif cfg.get('work_dir', None) is None:
         # use config filename as default work_dir if cfg.work_dir is None
         cfg.work_dir = osp.join('./work_dirs',

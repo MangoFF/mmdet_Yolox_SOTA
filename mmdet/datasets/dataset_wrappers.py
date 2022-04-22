@@ -404,13 +404,14 @@ class MultiImageMixDataset:
                 indexes = transform.get_indexes(self.dataset)
                 if not isinstance(indexes, collections.abc.Sequence):
                     indexes = [indexes]
+                #把需要mix的图片取出来，用来mix
                 mix_results = [
                     copy.deepcopy(self.dataset[index]) for index in indexes
                 ]
                 results['mix_results'] = mix_results
-
+            #经过trainsform，mix起来
             results = transform(results)
-
+            #把原来放进去的用来mix的图取出来，只输出结果
             if 'mix_results' in results:
                 results.pop('mix_results')
 
