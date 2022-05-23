@@ -22,7 +22,7 @@ from mmdet.utils import (collect_env, get_root_logger, setup_multi_processes,
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('--config',default= "mmdetection/configs/yolox/yolox_l_mango.py", help='train config file path')
+    parser.add_argument('--config',default= "mmdetection/configs/yolox/yolox_x_baseline.py", help='train config file path')
     parser.add_argument('--work-dir',default="ckpt",help='the dir to save logs and models')
     parser.add_argument(
         '--resume-from', help='the checkpoint file to resume from')

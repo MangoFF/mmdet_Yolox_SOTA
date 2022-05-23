@@ -66,7 +66,7 @@ class LoadImageFromFile:
 
         img_bytes = self.file_client.get(filename)
         img = mmcv.imfrombytes(
-            img_bytes, flag=self.color_type, channel_order=self.channel_order)
+            img_bytes, flag=self.color_type, channel_order=self.channel_order, backend='pillow')
         if self.to_float32:
             img = img.astype(np.float32)
 

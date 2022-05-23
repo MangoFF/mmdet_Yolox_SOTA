@@ -1,30 +1,27 @@
 _base_ = ['../_base_/schedules/schedule_1x.py', '../_base_/default_runtime.py']
 
-img_scale = (480, 480)  # height, width
-# lr 默认是0.01
-exp_name = "Yolox_l_lrd35_s480_ldckpt"
+img_scale = (544, 544)  # height, width
+exp_name="baseline"
 # model settings
 model = dict(
     type='YOLOX',
     input_size=img_scale,
-    #这里改一点点
-    random_size_range=(img_scale[0]/32-5,img_scale[0]/32+5),
-    random_size_interval=20,
-    backbone=dict(type='CSPDarknet', deepen_factor=1, widen_factor=1),
+    random_size_range=(20, 20),
+    random_size_interval=10,
+    backbone=dict(type='CSPDarknet', deepen_factor=1.33, widen_factor=1.25),
     neck=dict(
         type='YOLOXPAFPN',
-        in_channels=[256, 512, 1024],
-        out_channels=256, num_csp_blocks=3),
+        in_channels=[320, 640, 1280], out_channels=320, num_csp_blocks=4),
     bbox_head=dict(
-        type='YOLOXHead', num_classes=10, in_channels=256, feat_channels=256),
-    train_cfg=dict(assigner=dict(type='SimOTAAssigner', center_radius=2.5)),
+        type='YOLOXHead', num_classes=10, in_channels=320, feat_channels=320),
+    train_cfg=dict(assigner=dict(type='SimOTAAssigner', center_radius=2.5),gpu_assign_thr=2000),
     # In order to align the source code, the threshold of the val phase is
     # 0.01, and the threshold of the test phase is 0.001.
-    test_cfg=dict(score_thr=0.01, nms=dict(type='nms', iou_threshold=0.65)))
-#半进度训练
-fp16 = dict(loss_scale=512.)
+    test_cfg=dict(score_thr=0.01, nms=dict(type='nms', iou_threshold=0.65)),
+   )
+fp16 = dict(loss_scale=dict(init_scale=512))
 # dataset settings
-data_root = 'mmdetection/data/coco/'
+data_root = 'mmdetection/data/COCO_playground/'
 dataset_type = 'CocoDataset'
 
 train_pipeline = [
@@ -36,7 +33,7 @@ train_pipeline = [
     dict(
         type='MixUp',
         img_scale=img_scale,
-        ratio_range=(0.5, 1.5),
+        ratio_range=(0.8, 1.6),
         pad_val=114.0),
     dict(type='YOLOXHSVRandomAug'),
     dict(type='RandomFlip', flip_ratio=0.5),
@@ -50,7 +47,7 @@ train_pipeline = [
         # If the image is three-channel, the pad value needs
         # to be set separately for each channel.
         pad_val=dict(img=(114.0, 114.0, 114.0))),
-    #dict(type='FilterAnnotations', min_gt_bbox_wh=(1, 1), keep_empty=False),
+    dict(type='FilterAnnotations', min_gt_bbox_wh=(1, 1), keep_empty=False),
     dict(type='DefaultFormatBundle'),
     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
 ]
@@ -76,7 +73,6 @@ test_pipeline = [
         img_scale=img_scale,
         flip=False,
         transforms=[
-            #在这里pad的时候是保持ration的，所以后面菜肴pad，同时补充的值是114
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
             dict(
@@ -89,10 +85,8 @@ test_pipeline = [
 ]
 
 data = dict(
-    samples_per_gpu=36,
+    samples_per_gpu=16,
     workers_per_gpu=4,
-    # samples_per_gpu=2,
-    # workers_per_gpu=2,
     persistent_workers=True,
     train=train_dataset,
     val=dict(
@@ -110,7 +104,7 @@ data = dict(
 # default 8 gpu
 optimizer = dict(
     type='SGD',
-    lr=0.01/35.0,
+    lr=0.01,
     momentum=0.9,
     weight_decay=5e-4,
     nesterov=True,
@@ -118,9 +112,8 @@ optimizer = dict(
 optimizer_config = dict(grad_clip=None)
 
 max_epochs = 45
-num_last_epochs = 5
+num_last_epochs = 10
 resume_from = None
-#每10个epoch保存和eval一次
 interval = 10
 
 # learning policy
@@ -131,9 +124,9 @@ lr_config = dict(
     by_epoch=False,
     warmup_by_epoch=True,
     warmup_ratio=1,
-    warmup_iters=10,  # 5 epoch
+    warmup_iters=5,  # 5 epoch
     num_last_epochs=num_last_epochs,
-    min_lr_ratio=0.01)
+    min_lr_ratio=0.05)
 
 runner = dict(type='EpochBasedRunner', max_epochs=max_epochs)
 
@@ -150,7 +143,7 @@ custom_hooks = [
     dict(
         type='ExpMomentumEMAHook',
         resume_from=resume_from,
-        momentum=0.001,
+        momentum=0.0001,
         priority=49)
 ]
 checkpoint_config = dict(interval=interval)
@@ -163,5 +156,5 @@ evaluation = dict(
     interval=interval,
     dynamic_intervals=[(max_epochs - num_last_epochs, 1)],
     metric='bbox')
-log_config = dict(interval=20)
-load_from = "mmdetection/ckpt/yolox_l.ckpt"
+log_config = dict(interval=50)
+load_from = "mmdetection/ckpt/yolox_x.ckpt"
